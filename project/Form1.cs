@@ -32,7 +32,20 @@ namespace project
 
         private void buttonRGB_Click(object sender, EventArgs e)
         {
+            FormRGB form = new FormRGB(currentFileName);
+            form.ShowDialog();
+        }
 
+        private void buttonGray_Click(object sender, EventArgs e)
+        {
+            FormGray form = new FormGray(currentFileName);
+            form.ShowDialog();
+        }
+
+        private void buttonHSV_Click(object sender, EventArgs e)
+        {
+            FormHSV form = new FormHSV(currentFileName);
+            form.ShowDialog();
         }
     }
 }

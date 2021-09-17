@@ -64,6 +64,7 @@ namespace project
             this.buttonGray.TabIndex = 1;
             this.buttonGray.Text = "В оттенки серого";
             this.buttonGray.UseVisualStyleBackColor = true;
+            this.buttonGray.Click += new System.EventHandler(this.buttonGray_Click);
             // 
             // buttonRGB
             // 
@@ -87,6 +88,7 @@ namespace project
             this.buttonHSV.TabIndex = 3;
             this.buttonHSV.Text = "Перевести в HSV";
             this.buttonHSV.UseVisualStyleBackColor = true;
+            this.buttonHSV.Click += new System.EventHandler(this.buttonHSV_Click);
             // 
             // pictureBox
             // 
@@ -110,6 +112,7 @@ namespace project
             this.Controls.Add(this.buttonGetImage);
             this.Controls.Add(this.pictureBox);
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Основы основ";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
             this.ResumeLayout(false);
