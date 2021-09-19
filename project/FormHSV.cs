@@ -12,13 +12,20 @@ namespace project
 {
     public partial class FormHSV : Form
     {
+        double averageHue;
+        double averageSaturation;
+        double averageValue;
+
         private class HSV
         {
-            public double hue;
+            // 0-360
+            public int hue;
+            // 0-100
             public double saturation;
+            // 0-100
             public double value;
 
-            public HSV(double hue, double saturation, double value)
+            public HSV(int hue, double saturation, double value)
             {
                 this.hue = hue;
                 this.saturation = saturation;
@@ -46,12 +53,16 @@ namespace project
             InitializeComponent();
         }
 
-        private HSV RGBtoHSV(double R, double G, double B)
+        private static HSV RGBtoHSV(byte red, byte green, byte blue)
         {
+            double R = Math.Round(red / 255.0, 3), G = Math.Round(green / 255.0, 3), B = Math.Round(blue / 255.0, 3);
             double h = 0, s;
             double max = Math.Max(Math.Max(R, G),B);
             double min = Math.Min(Math.Min(R, G), B);
-            if((max == R) && (G>=B)) {
+            if(max == min)
+            {
+                h = 0;
+            } else if((max == R) && (G>=B)) {
                 h = 60 * ((G - B) / (max - min));
             } else if((max == R) && (G < B))
             {
@@ -66,7 +77,7 @@ namespace project
 
             s = max == 0 ? 0 : (1 - (min / max));
 
-            return new HSV(h, s*100, max*100);
+            return new HSV((int)Math.Round(h), Math.Round(s*100,2), Math.Round(max*100,2));
         }
         private byte bytify (double color)
         {
@@ -94,16 +105,46 @@ namespace project
         private void FormHSV_Load(object sender, EventArgs e)
         {
             bitmap = new Bitmap(imagePath);
-            for(int x = 0; x < bitmap.Size.Width; x++)
-            {
-                for(int y = 0; y < bitmap.Size.Height; y++)
-                {
-                    Color pixel = bitmap.GetPixel(x,y);
-                    var hsv = RGBtoHSV(pixel.R / 256, pixel.G / 256, pixel.B / 256);
-                }
-            }
+
+            var res = RGBtoHSV(127, 100, 14);
             
+            using (var fbitmap = new FastBitmap(bitmap))
+            {
+                long hue = 0, saturation = 0, value = 0;
+                for (int x = 0; x < fbitmap.Width; x++)
+                {
+                    for (int y = 0; y < fbitmap.Height; y++)
+                    {
+                        Color pixel = fbitmap.GetPixel(new Point(x, y));
+                        var hsv = RGBtoHSV(pixel.R, pixel.G, pixel.B);
+                        hue += hsv.hue;
+                        saturation += (int)hsv.saturation;
+                        value += (int)hsv.value;
+                    }
+                }
+                averageHue = hue / fbitmap.Count;
+                averageSaturation = saturation / fbitmap.Count;
+                averageValue = value / fbitmap.Count;
+            }
+            trackBarHue.Value = (int)averageHue;
+            trackBarSaturation.Value = (int)averageSaturation;
+            trackBarValue.Value = (int)averageValue;
             pictureBox.Image = bitmap;
+        }
+
+        private void trackBarHue_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void trackBarSaturation_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void trackBarValue_ValueChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
