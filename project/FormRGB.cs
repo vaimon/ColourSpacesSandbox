@@ -22,6 +22,10 @@ namespace project
         private void FormRGB_Load(object sender, EventArgs e)
         {
             pictureBox.Load(imagePath);
+            pictureBox1.Load(imagePath);
+            pictureBox2.Load(imagePath);
+            pictureBox3.Load(imagePath);
         }
+
     }
 }
