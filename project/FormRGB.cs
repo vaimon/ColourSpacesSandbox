@@ -15,6 +15,10 @@ namespace project
         string imagePath;
         Bitmap bitmap;
 
+        static SortedDictionary<int, int> redChanell = new SortedDictionary<int, int>();
+        static SortedDictionary<int, int> greenChanell = new SortedDictionary<int, int>();
+        static SortedDictionary<int, int> blueChanell = new SortedDictionary<int, int>();
+
         private class RGB
         {
             public byte r, g, b;
@@ -26,14 +30,10 @@ namespace project
                 this.b = b;
             }
         }
-
-        //полуфаст
+       
         static Bitmap[] GetRgbChannels(Bitmap bm)
         {
-            //Bitmap temp = new Bitmap(bm.Width, bm.Height);
-            //Bitmap redBitmap = new Bitmap(bm.Width, bm.Height), greenBitmap = new Bitmap(bm.Width, bm.Height), blueBitmap = new Bitmap(bm.Width, bm.Height);
-            //FastBitmap redFBM = new FastBitmap(redBitmap), greenFBM = new FastBitmap(greenBitmap), blueFBM = new FastBitmap(blueBitmap);
-            //FastBitmap redFBM = new FastBitmap(temp), greenFBM = new FastBitmap(temp), blueFBM = new FastBitmap(temp);
+
             Bitmap[] result = new Bitmap[3] { new Bitmap(bm.Width, bm.Height), new Bitmap(bm.Width, bm.Height), new Bitmap(bm.Width, bm.Height) };
             using (var fbitmap = new FastBitmap(bm))
             {
@@ -42,47 +42,74 @@ namespace project
                     for (int j = 0; j < fbitmap.Height; j++)
                     {
                         Color color = fbitmap.GetPixel(new Point(i, j));
-                        //Color color = bm.GetPixel(i, j);
 
-                        //result[0].SetPixel(new Point(i, j), Color.FromArgb(color.A, color.R, 0, 0));
-                        //result[1].SetPixel(new Point(i, j), Color.FromArgb(color.A, 0, color.G, 0));
-                        //result[2].SetPixel(new Point(i, j), Color.FromArgb(color.A, 0, 0, color.B));
                         result[0].SetPixel(i, j, Color.FromArgb(color.A, color.R, 0, 0));
                         result[1].SetPixel(i, j, Color.FromArgb(color.A, 0, color.G, 0));
                         result[2].SetPixel(i, j, Color.FromArgb(color.A, 0, 0, color.B));
+
+                        //подсчёт значений красного для гистограммы
+                        if (redChanell.ContainsKey(color.R))
+                            redChanell[color.R]++;
+                        else
+                            redChanell.Add(color.R, 1);
+
+                        //подсчёт значений зеленого для гистограммы
+                        if (greenChanell.ContainsKey(color.G))
+                            greenChanell[color.G]++;
+                        else
+                            greenChanell.Add(color.G, 1);
+
+                        //подсчёт значений синего для гистограммы
+                        if (blueChanell.ContainsKey(color.B))
+                            blueChanell[color.B]++;
+                        else
+                            blueChanell.Add(color.B, 1);
                     }
                 }
             }
             return result;
         }
 
-        /*        static FastBitmap[] GetRgbChannels(FastBitmap bm)
+        public static Bitmap Histogram()
+        {
+            Bitmap res = new Bitmap(256, 256);
+
+            int max = 0;
+            for (int i = 0; i < 256; ++i)
+            {
+                if (redChanell[i] > max)
+                    max = redChanell[i];
+
+                if (greenChanell[i] > max)
+                    max = greenChanell[i];
+
+                if (blueChanell[i] > max)
+                    max = blueChanell[i];
+            }
+           
+            double point = (double)max / 256;
+            
+            for (int i = 0; i < 253; ++i)
+            {
+                for (int j = 255; j > 256 - redChanell[i / 3] / point; --j)
                 {
-                    Bitmap temp = new Bitmap(bm.Width, bm.Height);
-                    //Bitmap redBitmap = new Bitmap(bm.Width, bm.Height), greenBitmap = new Bitmap(bm.Width, bm.Height), blueBitmap = new Bitmap(bm.Width, bm.Height);
-                    //FastBitmap redFBM = new FastBitmap(redBitmap), greenFBM = new FastBitmap(greenBitmap), blueFBM = new FastBitmap(blueBitmap);
-                    FastBitmap redFBM = new FastBitmap(temp), greenFBM = new FastBitmap(temp), blueFBM = new FastBitmap(temp);
-                    //Bitmap[] result = new Bitmap[3] { new Bitmap(bm.Width, bm.Height), new Bitmap(bm.Width, bm.Height), new Bitmap(bm.Width, bm.Height) };
-                    FastBitmap[] result = new FastBitmap[3] { redFBM, greenFBM, blueFBM };
+                    res.SetPixel(i, j, Color.Red);
+                }
+                ++i;
+                for (int j = 255; j > 256 - greenChanell[i / 3] / point; --j)
+                {
+                    res.SetPixel(i, j, Color.Green);
+                }
+                ++i;
+                for (int j  = 255; j > 256 - blueChanell[i / 3] / point; --j)
+                {
+                    res.SetPixel(i, j, Color.Blue);
+                }
+            }
 
-                    for (int i = 0; i < bm.Width; i++)
-                    {
-                        for (int j = 0; j < bm.Height; j++)
-                        {
-                            Color color = bm.GetPixel(new Point(i, j));
-                            //Color color = bm.GetPixel(i, j);
+            return res;
 
-                            result[0].SetPixel(new Point(i, j), Color.FromArgb(color.A, color.R, 0, 0));
-                            result[1].SetPixel(new Point(i, j), Color.FromArgb(color.A, 0, color.G, 0));
-                            result[2].SetPixel(new Point(i, j), Color.FromArgb(color.A, 0, 0, color.B));
-                            //result[0].SetPixel(i, j, Color.FromArgb(color.A, color.R, 0, 0));
-                            //result[1].SetPixel(i, j, Color.FromArgb(color.A, 0, color.G, 0));
-                            //result[2].SetPixel(i, j, Color.FromArgb(color.A, 0, 0, color.B));
-                        }
-                    }
-
-                    return result;
-                }*/
+        }
 
         public FormRGB(string imagePath)
         {
@@ -93,20 +120,17 @@ namespace project
         private void FormRGB_Load(object sender, EventArgs e)
         {
             pictureBox.Load(imagePath);
-            //pictureBox1.Load(imagePath);
-            //pictureBox2.Load(imagePath);
-            //pictureBox3.Load(imagePath);
 
             Image newImage = Image.FromFile(imagePath);
             bitmap = new Bitmap(newImage);
-            //Bitmap[] res;           
-            //Bitmap[] res = new Bitmap[3] { new Bitmap(bitmap.Width, bitmap.Height), new Bitmap(bitmap.Width, bitmap.Height), new Bitmap(bitmap.Width, bitmap.Height) };
 
             var res = GetRgbChannels(bitmap);
 
             pictureBox1.Image = res[0];
             pictureBox2.Image = res[1];
             pictureBox3.Image = res[2];
+
+            pictureBox4.Image = Histogram();
 
         }
     }
