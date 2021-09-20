@@ -19,18 +19,6 @@ namespace project
         static SortedDictionary<int, int> redChanell = new SortedDictionary<int, int>();
         static SortedDictionary<int, int> greenChanell = new SortedDictionary<int, int>();
         static SortedDictionary<int, int> blueChanell = new SortedDictionary<int, int>();
-
-        private class RGB
-        {
-            public byte r, g, b;
-
-            public RGB(byte r, byte g, byte b)
-            {
-                this.r = r;
-                this.g = g;
-                this.b = b;
-            }
-        }
        
         static Bitmap[] GetRgbChannels(Bitmap bm)
         {
@@ -42,7 +30,7 @@ namespace project
                 {
                     for (int j = 0; j < fbitmap.Height; j++)
                     {
-                        Color color = fbitmap.GetPixel(new Point(i, j));
+                        Color color = fbitmap.GetPixel(new Point(i, j)); // FastBitmap для чтения текущего пикселя
 
                         result[0].SetPixel(i, j, Color.FromArgb(color.A, color.R, 0, 0));
                         result[1].SetPixel(i, j, Color.FromArgb(color.A, 0, color.G, 0));
@@ -75,10 +63,7 @@ namespace project
         {
             Bitmap res = new Bitmap(256, 256);
 
-            var rkeys = redChanell.Keys;
-            var gkeys = greenChanell.Keys;
-            var bkeys = blueChanell.Keys;
-
+            // необходимо, чтобы не было ошибок при обращении к несуществующим в изображении пикселям
             for (int i = 0; i < 256; i++)
             {
                 if (!redChanell.ContainsKey(i))
@@ -89,6 +74,7 @@ namespace project
                     blueChanell[i] = 0;
             }
 
+            // максимальное значение по Y для масштабирования
             for (int i = 0; i < 256; i++)
             {
                 if (redChanell[i] > max)
@@ -99,10 +85,9 @@ namespace project
 
                 if (blueChanell[i] > max)
                     max = blueChanell[i];
-            }
-            
-        
+            }              
            
+            // масштабирование по Y
             double point = (double)max / 256;
             
             for (int i = 0; i < 256; ++i)
@@ -129,19 +114,19 @@ namespace project
 
         private void FormRGB_Load(object sender, EventArgs e)
         {
-            pictureBox.Load(imagePath);
+            pictureBox.Load(imagePath); // исходное изображение
 
             Image newImage = Image.FromFile(imagePath);
             bitmap = new Bitmap(newImage);
 
             var res = GetRgbChannels(bitmap);
 
-            pictureBox1.Image = res[0];
-            pictureBox2.Image = res[1];
-            pictureBox3.Image = res[2];
+            pictureBox1.Image = res[0]; // R
+            pictureBox2.Image = res[1]; // G
+            pictureBox3.Image = res[2]; // B
             
             pictureBox4.Image = Histogram();
-            label8.Text = max.ToString();
+            label8.Text = max.ToString(); // максимальное значение по Y
 
         }
     }
