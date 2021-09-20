@@ -14,6 +14,7 @@ namespace project
     {
         string imagePath;
         Bitmap bitmap;
+        static int max = 0;
 
         static SortedDictionary<int, int> redChanell = new SortedDictionary<int, int>();
         static SortedDictionary<int, int> greenChanell = new SortedDictionary<int, int>();
@@ -74,8 +75,21 @@ namespace project
         {
             Bitmap res = new Bitmap(256, 256);
 
-            int max = 0;
-            for (int i = 0; i < 256; ++i)
+            var rkeys = redChanell.Keys;
+            var gkeys = greenChanell.Keys;
+            var bkeys = blueChanell.Keys;
+
+            for (int i = 0; i < 256; i++)
+            {
+                if (!redChanell.ContainsKey(i))
+                    redChanell[i] = 0;
+                if (!greenChanell.ContainsKey(i))
+                    greenChanell[i] = 0;
+                if (!blueChanell.ContainsKey(i))
+                    blueChanell[i] = 0;
+            }
+
+            for (int i = 0; i < 256; i++)
             {
                 if (redChanell[i] > max)
                     max = redChanell[i];
@@ -86,25 +100,21 @@ namespace project
                 if (blueChanell[i] > max)
                     max = blueChanell[i];
             }
+            
+        
            
             double point = (double)max / 256;
             
-            for (int i = 0; i < 253; ++i)
+            for (int i = 0; i < 256; ++i)
             {
-                for (int j = 255; j > 256 - redChanell[i / 3] / point; --j)
-                {
+                for (int j = 255; j > 256 - redChanell[i] / point; --j)                
                     res.SetPixel(i, j, Color.Red);
-                }
-                ++i;
-                for (int j = 255; j > 256 - greenChanell[i / 3] / point; --j)
-                {
+                
+                for (int j = 255; j > 256 - greenChanell[i] / point; --j)                
                     res.SetPixel(i, j, Color.Green);
-                }
-                ++i;
-                for (int j  = 255; j > 256 - blueChanell[i / 3] / point; --j)
-                {
-                    res.SetPixel(i, j, Color.Blue);
-                }
+                
+                for (int j  = 255; j > 256 - blueChanell[i] / point; --j)                
+                    res.SetPixel(i, j, Color.Blue);               
             }
 
             return res;
@@ -129,8 +139,9 @@ namespace project
             pictureBox1.Image = res[0];
             pictureBox2.Image = res[1];
             pictureBox3.Image = res[2];
-
+            
             pictureBox4.Image = Histogram();
+            label8.Text = max.ToString();
 
         }
     }
