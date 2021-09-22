@@ -16,7 +16,7 @@ namespace project
         double averageSaturation;
         double averageValue;
 
-        int currentHue;
+        double currentHue;
         double currentSaturation;
         double currentValue;
 
@@ -25,20 +25,20 @@ namespace project
         private class HSV
         {
             // 0-360
-            public int hue;
+            public double hue;
             // 0-100
             public double saturation;
             // 0-100
             public double value;
 
-            public HSV(int hue, double saturation, double value)
+            public HSV(double hue, double saturation, double value)
             {
-                this.hue = hue;
-                this.saturation = saturation;
-                this.value = value;
+                this.hue = Math.Round(hue,1);
+                this.saturation = Math.Round(saturation * 100, 1);
+                this.value = Math.Round(value * 100, 1);
             }
 
-            public void add(int hue, double sat, double val)
+            public void add(double hue, double sat, double val)
             {
                 if(this.hue + hue < 0)
                 {
@@ -71,7 +71,7 @@ namespace project
                 }
                 else
                 {
-                    value += sat;
+                    value += val;
                 }
 
             }
@@ -99,33 +99,35 @@ namespace project
 
         private static HSV RGBtoHSV(byte red, byte green, byte blue)
         {
-            double R = Math.Round(red / 255.0, 3), G = Math.Round(green / 255.0, 3), B = Math.Round(blue / 255.0, 3);
             double h = 0, s;
-            double max = Math.Max(Math.Max(R, G),B);
-            double min = Math.Min(Math.Min(R, G), B);
-            if(max == min)
+            byte max = Math.Max(Math.Max(red, green),blue);
+            byte min = Math.Min(Math.Min(red, green), blue);
+            s = 1.0 - (min * 1.0 / max);
+            if (max == 0)
             {
                 h = 0;
-            } else if((max == R) && (G>=B)) {
-                h = 60 * ((G - B) / (max - min));
-            } else if((max == R) && (G < B))
+                s = 0;
+            } else if(max == min)
             {
-                h = 60 * ((G - B) / (max - min)) + 360;
-            } else if(max == G)
+                h = 0;
+            } else if((max == red) && (green>=blue)) {
+                h = 60 * ((green - blue) / (max* 1.0 - min));
+            } else if((max == red) && (green < blue))
             {
-                h = 60 * ((B - R) / (max - min)) + 120;
-            } else if (max == B)
+                h = 60 * ((green - blue) / (1.0 * max - min)) + 360;
+            } else if(max == green)
             {
-                h = 60 * ((R - G) / (max - min)) + 240;
+                h = 60 * ((blue - red) / (1.0 * max - min)) + 120;
+            } else if (max == blue)
+            {
+                h = 60 * ((red - green) / (1.0 * max - min)) + 240;
             }
 
-            s = max == 0 ? 0 : (1 - (min / max));
-
-            return new HSV((int)Math.Round(h), Math.Round(s*100,2), Math.Round(max*100,2));
+            return new HSV(h, s, max/255.0);
         }
         private byte bytify (double color)
         {
-            return (byte)((255 / 100) * color);
+            return (byte)Math.Round((255 / 100.0) * color);
         }
         private RGB HSVtoRGB(double hue, double saturation, double value)
         {
@@ -148,13 +150,10 @@ namespace project
 
         private void FormHSV_Load(object sender, EventArgs e)
         {
-            bitmap = new Bitmap(imagePath);
-
-            var res = HSVtoRGB(120, 60, 40);
-            
+            bitmap = new Bitmap(imagePath);            
             using (var fbitmap = new FastBitmap(bitmap))
             {
-                long hue = 0, saturation = 0, value = 0;
+                double hue = 0, saturation = 0, value = 0;
                 for (int x = 0; x < fbitmap.Width; x++)
                 {
                     for (int y = 0; y < fbitmap.Height; y++)
@@ -162,25 +161,28 @@ namespace project
                         Color pixel = fbitmap.GetPixel(new Point(x, y));
                         var hsv = RGBtoHSV(pixel.R, pixel.G, pixel.B);
                         hue += hsv.hue;
-                        saturation += (int)hsv.saturation;
-                        value += (int)hsv.value;
+                        saturation += Math.Round(hsv.saturation,1);
+                        value += Math.Round(hsv.value, 1);
                     }
                 }
-                currentHue = averageHue = (int) hue / fbitmap.Count;
-                currentSaturation = averageSaturation = saturation / fbitmap.Count;
-                currentValue = averageValue = value / fbitmap.Count;
+                currentHue = averageHue = (int) (hue / fbitmap.Count);
+                currentSaturation = averageSaturation = Math.Round(saturation / fbitmap.Count, 1);
+                currentValue = averageValue = Math.Round(value / fbitmap.Count,1);
             }
-            trackBarHue.Value = averageHue;
-            trackBarSaturation.Value = (int)averageSaturation;
-            trackBarValue.Value = (int)averageValue;
+            numericUpDownHue.Value = averageHue;
+            numericUpDownSaturation.Value = (int)averageSaturation;
+            numericUpDownValue.Value = (int)averageValue;
             pictureBox.Image = bitmap;
             isLoaded = true;
         }
 
-        private void updateImage(int hueShift = 0, double satShift = 0, double valShift = 0)
+        private void updateImage()
         {
-            Bitmap bitmap = (Bitmap) pictureBox.Image;
-            using (var fbitmap = new FastBitmap(bitmap))
+            double hueShift = currentHue - averageHue;
+            double satShift = currentSaturation - averageSaturation;
+            double valShift = currentValue - averageValue;
+            var nbitmap = bitmap.Clone() as Bitmap;
+            using (var fbitmap = new FastBitmap(nbitmap))
             {
                 for (int x = 0; x < fbitmap.Width; x++)
                 {
@@ -195,37 +197,41 @@ namespace project
                     }
                 }
             }
-            pictureBox.Image = bitmap;
+            pictureBox.Image = nbitmap;
         }
 
-        private void trackBarHue_ValueChanged(object sender, EventArgs e)
+      
+
+
+        private void numericUpDownValue_ValueChanged(object sender, EventArgs e)
         {
             if (!isLoaded)
             {
                 return;
             }
-            updateImage(hueShift: trackBarHue.Value - currentHue);
-            currentHue = trackBarHue.Value;
+            currentValue = (double)numericUpDownValue.Value;
+            updateImage();
         }
 
-        private void trackBarSaturation_ValueChanged(object sender, EventArgs e)
+        private void numericUpDownSaturation_ValueChanged(object sender, EventArgs e)
         {
             if (!isLoaded)
             {
                 return;
             }
-            updateImage(satShift: trackBarSaturation.Value - currentSaturation);
-            currentSaturation = trackBarSaturation.Value;
+            currentSaturation = (double)numericUpDownSaturation.Value;
+            updateImage();
         }
 
-        private void trackBarValue_ValueChanged(object sender, EventArgs e)
+        private void numericUpDownHue_ValueChanged(object sender, EventArgs e)
         {
             if (!isLoaded)
             {
                 return;
             }
-            updateImage(valShift: trackBarValue.Value - currentValue);
-            currentValue = trackBarValue.Value;
+            currentHue = (double)numericUpDownHue.Value;
+            updateImage();
+           
         }
     }
 }
