@@ -18,15 +18,22 @@ namespace project
         string imagePath;
        // Bitmap bitmap;
         static int max = 0;
+        static int coef=0;
         public FormGray(string imagePath)
         {
             this.imagePath = imagePath;
             //this.Text = "50 оттенков серого";
             InitializeComponent();
+            comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
         }
         static byte bytify(double color)
         {
             return (byte)((255/100 )* color);
+        }
+        void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            coef = (int)comboBox1.SelectedItem;
+            
         }
         static Bitmap GoToGrey(Bitmap input,int flag)
         {
@@ -64,10 +71,11 @@ namespace project
             return res;
             }
         
-        static Bitmap GetDifference(Bitmap input1,Bitmap input2)
+        static Bitmap GetDifference(Bitmap input1,Bitmap input2,int c)
         {
             Bitmap res = new Bitmap(input1.Width, input1.Height);
-            int a,r, g, b;
+            
+            int a,r, g, b,col;
             var fbitmap2 = new FastBitmap(input2);
             using (var fbitmap1 = new FastBitmap(input1))
             {
@@ -78,14 +86,18 @@ namespace project
                         Color color1 = fbitmap1.GetPixel(new Point(i, j)); // FastBitmap для чтения текущего пикселя
                         Color color2 = fbitmap2.GetPixel(new Point(i, j));
 
-                            a = Math.Abs( color2.A - color1.A);
+                           // a = Math.Abs( color2.A - color1.A);
                             r = Math.Abs(color2.R -color1.R);
-                            g = Math.Abs(color2.G -color1.G);
-                            b = Math.Abs(color2.B -color1.B);
+                           // g = Math.Abs(color2.G -color1.G);
+                            //b = Math.Abs(color2.B -color1.B);
+
+                        if (r * c > 255)
+                             col = 255;
+                        else
+                            col = r * c;
 
                         
-                        
-                        res.SetPixel(i, j, Color.FromArgb( r, r, r));
+                        res.SetPixel(i, j, Color.FromArgb(col,col,col));
                     }
                 }
             }
@@ -105,7 +117,7 @@ namespace project
                 {
                     for (int j = 0; j < fbitmap.Height; j++)
                     {
-                        Color color = fbitmap.GetPixel(new Point(i, j)); // FastBitmap для чтения текущего пикселя
+                        Color color = fbitmap.GetPixel(new Point(i, j)); 
                         //int x = color.R;
                            
                         if (intense.ContainsKey(color.R))
@@ -180,7 +192,8 @@ namespace project
             //Image newImage = Image.FromFile(imagePath);
             var bitmap1 = new Bitmap(pictureBox1.Image);
             var bitmap2 = new Bitmap(pictureBox2.Image);
-            var res = GetDifference(bitmap1,bitmap2);
+            
+            var res = GetDifference(bitmap1,bitmap2,coef);
             pictureBox3.Image = res;
         }
 
