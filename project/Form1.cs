@@ -39,6 +39,7 @@ namespace project
         private void buttonGray_Click(object sender, EventArgs e)
         {
             FormGray form = new FormGray(currentFileName);
+            
             form.ShowDialog();
         }
 
@@ -46,6 +47,11 @@ namespace project
         {
             FormHSV form = new FormHSV(currentFileName);
             form.ShowDialog();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
