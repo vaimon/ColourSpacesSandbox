@@ -32,7 +32,6 @@ namespace project
             );
             _bytesPerPixel = _bData.Stride / Width;
             _scan0 = (byte*) _bData.Scan0.ToPointer();
-
         }
 
         private Color GetI(int i)
