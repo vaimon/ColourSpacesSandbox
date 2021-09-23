@@ -33,13 +33,15 @@ namespace project
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.numericUpDownHue = new System.Windows.Forms.NumericUpDown();
-            this.numericUpDownSaturation = new System.Windows.Forms.NumericUpDown();
-            this.numericUpDownValue = new System.Windows.Forms.NumericUpDown();
+            this.trackBarHue = new System.Windows.Forms.TrackBar();
+            this.trackBarSaturation = new System.Windows.Forms.TrackBar();
+            this.trackBarValue = new System.Windows.Forms.TrackBar();
+            this.buttonSave = new System.Windows.Forms.Button();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHue)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSaturation)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarHue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarSaturation)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarValue)).BeginInit();
             this.SuspendLayout();
             // 
             // pictureBox
@@ -84,55 +86,66 @@ namespace project
             this.label3.Text = "Value | Значение";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // numericUpDownHue
+            // trackBarHue
             // 
-            this.numericUpDownHue.Location = new System.Drawing.Point(657, 127);
-            this.numericUpDownHue.Maximum = new decimal(new int[] {
-            360,
-            0,
-            0,
-            0});
-            this.numericUpDownHue.Name = "numericUpDownHue";
-            this.numericUpDownHue.Size = new System.Drawing.Size(180, 31);
-            this.numericUpDownHue.TabIndex = 6;
-            this.numericUpDownHue.ValueChanged += new System.EventHandler(this.numericUpDownHue_ValueChanged);
+            this.trackBarHue.Location = new System.Drawing.Point(630, 127);
+            this.trackBarHue.Maximum = 180;
+            this.trackBarHue.Minimum = -180;
+            this.trackBarHue.Name = "trackBarHue";
+            this.trackBarHue.Size = new System.Drawing.Size(229, 69);
+            this.trackBarHue.TabIndex = 9;
+            this.trackBarHue.TickFrequency = 0;
+            this.trackBarHue.TickStyle = System.Windows.Forms.TickStyle.Both;
+            this.trackBarHue.ValueChanged += new System.EventHandler(this.trackBarHue_ValueChanged);
             // 
-            // numericUpDownSaturation
+            // trackBarSaturation
             // 
-            this.numericUpDownSaturation.DecimalPlaces = 1;
-            this.numericUpDownSaturation.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.numericUpDownSaturation.Location = new System.Drawing.Point(657, 266);
-            this.numericUpDownSaturation.Name = "numericUpDownSaturation";
-            this.numericUpDownSaturation.Size = new System.Drawing.Size(180, 31);
-            this.numericUpDownSaturation.TabIndex = 7;
-            this.numericUpDownSaturation.ValueChanged += new System.EventHandler(this.numericUpDownSaturation_ValueChanged);
+            this.trackBarSaturation.Location = new System.Drawing.Point(630, 262);
+            this.trackBarSaturation.Maximum = 100;
+            this.trackBarSaturation.Minimum = -100;
+            this.trackBarSaturation.Name = "trackBarSaturation";
+            this.trackBarSaturation.Size = new System.Drawing.Size(229, 69);
+            this.trackBarSaturation.TabIndex = 10;
+            this.trackBarSaturation.TickFrequency = 0;
+            this.trackBarSaturation.TickStyle = System.Windows.Forms.TickStyle.Both;
+            this.trackBarSaturation.ValueChanged += new System.EventHandler(this.trackBarSaturation_ValueChanged);
             // 
-            // numericUpDownValue
+            // trackBarValue
             // 
-            this.numericUpDownValue.DecimalPlaces = 1;
-            this.numericUpDownValue.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.numericUpDownValue.Location = new System.Drawing.Point(657, 398);
-            this.numericUpDownValue.Name = "numericUpDownValue";
-            this.numericUpDownValue.Size = new System.Drawing.Size(180, 31);
-            this.numericUpDownValue.TabIndex = 8;
-            this.numericUpDownValue.ValueChanged += new System.EventHandler(this.numericUpDownValue_ValueChanged);
+            this.trackBarValue.Location = new System.Drawing.Point(630, 399);
+            this.trackBarValue.Maximum = 100;
+            this.trackBarValue.Minimum = -100;
+            this.trackBarValue.Name = "trackBarValue";
+            this.trackBarValue.Size = new System.Drawing.Size(229, 69);
+            this.trackBarValue.TabIndex = 11;
+            this.trackBarValue.TickFrequency = 0;
+            this.trackBarValue.TickStyle = System.Windows.Forms.TickStyle.Both;
+            this.trackBarValue.ValueChanged += new System.EventHandler(this.trackBarValue_ValueChanged);
+            // 
+            // buttonSave
+            // 
+            this.buttonSave.Location = new System.Drawing.Point(687, 474);
+            this.buttonSave.Name = "buttonSave";
+            this.buttonSave.Size = new System.Drawing.Size(112, 34);
+            this.buttonSave.TabIndex = 12;
+            this.buttonSave.Text = "Сохранить";
+            this.buttonSave.UseVisualStyleBackColor = true;
+            this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
+            // 
+            // saveFileDialog1
+            // 
+            this.saveFileDialog1.Filter = "JPEG|*.jpeg";
+            this.saveFileDialog1.InitialDirectory = "C:\\Users\\niko1\\Desktop\\imagess";
             // 
             // FormHSV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(878, 544);
-            this.Controls.Add(this.numericUpDownValue);
-            this.Controls.Add(this.numericUpDownSaturation);
-            this.Controls.Add(this.numericUpDownHue);
+            this.Controls.Add(this.buttonSave);
+            this.Controls.Add(this.trackBarValue);
+            this.Controls.Add(this.trackBarSaturation);
+            this.Controls.Add(this.trackBarHue);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -145,10 +158,11 @@ namespace project
             this.Text = "Конвертация в HSV";
             this.Load += new System.EventHandler(this.FormHSV_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHue)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSaturation)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarHue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarSaturation)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarValue)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -158,8 +172,10 @@ namespace project
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.NumericUpDown numericUpDownHue;
-        private System.Windows.Forms.NumericUpDown numericUpDownSaturation;
-        private System.Windows.Forms.NumericUpDown numericUpDownValue;
+        private System.Windows.Forms.TrackBar trackBarHue;
+        private System.Windows.Forms.TrackBar trackBarSaturation;
+        private System.Windows.Forms.TrackBar trackBarValue;
+        private System.Windows.Forms.Button buttonSave;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
     }
 }

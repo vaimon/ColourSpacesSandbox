@@ -12,13 +12,9 @@ namespace project
 {
     public partial class FormHSV : Form
     {
-        double averageHue;
-        double averageSaturation;
-        double averageValue;
-
-        double currentHue;
-        double currentSaturation;
-        double currentValue;
+        int currentHue;
+        int currentSaturation;
+        int currentValue;
 
         bool isLoaded = false;
 
@@ -153,36 +149,12 @@ namespace project
         private void FormHSV_Load(object sender, EventArgs e)
         {
             bitmap = new Bitmap(imagePath);            
-            using (var fbitmap = new FastBitmap(bitmap))
-            {
-                double hue = 0, saturation = 0, value = 0;
-                for (int x = 0; x < fbitmap.Width; x++)
-                {
-                    for (int y = 0; y < fbitmap.Height; y++)
-                    {
-                        Color pixel = fbitmap.GetPixel(new Point(x, y));
-                        var hsv = RGBtoHSV(pixel.R, pixel.G, pixel.B);
-                        hue += hsv.hue;
-                        saturation += Math.Round(hsv.saturation,1);
-                        value += Math.Round(hsv.value, 1);
-                    }
-                }
-                currentHue = averageHue = (hue / fbitmap.Count);
-                currentSaturation = averageSaturation = Math.Round(saturation / fbitmap.Count, 1);
-                currentValue = averageValue = Math.Round(value / fbitmap.Count,1);
-            }
-            numericUpDownHue.Value = (decimal)averageHue;
-            numericUpDownSaturation.Value = (decimal)averageSaturation;
-            numericUpDownValue.Value = (decimal)averageValue;
             pictureBox.Image = bitmap;
             isLoaded = true;
         }
 
         private void updateImage()
         {
-            double hueShift = currentHue - averageHue;
-            double satShift = currentSaturation - averageSaturation;
-            double valShift = currentValue - averageValue;
             var nbitmap = bitmap.Clone() as Bitmap;
             using (var fbitmap = new FastBitmap(nbitmap))
             {
@@ -193,7 +165,7 @@ namespace project
                         var point = new Point(x, y);
                         Color pixel = fbitmap.GetPixel(point);
                         var hsv = RGBtoHSV(pixel.R, pixel.G, pixel.B);
-                        hsv.add(hueShift, satShift, valShift);
+                        hsv.add(currentHue, currentSaturation, currentValue);
                         var rgb = HSVtoRGB(hsv.hue, hsv.saturation, hsv.value);
                         fbitmap.SetPixel(point, Color.FromArgb(rgb.r, rgb.g, rgb.b));
                     }
@@ -202,38 +174,30 @@ namespace project
             pictureBox.Image = nbitmap;
         }
 
-      
-
-
-        private void numericUpDownValue_ValueChanged(object sender, EventArgs e)
+        private void trackBarHue_ValueChanged(object sender, EventArgs e)
         {
-            if (!isLoaded)
-            {
-                return;
-            }
-            currentValue = (double)numericUpDownValue.Value;
+            currentHue = trackBarHue.Value;
             updateImage();
         }
 
-        private void numericUpDownSaturation_ValueChanged(object sender, EventArgs e)
+        private void trackBarSaturation_ValueChanged(object sender, EventArgs e)
         {
-            if (!isLoaded)
-            {
-                return;
-            }
-            currentSaturation = (double)numericUpDownSaturation.Value;
+            currentSaturation = trackBarSaturation.Value;
             updateImage();
         }
 
-        private void numericUpDownHue_ValueChanged(object sender, EventArgs e)
+        private void trackBarValue_ValueChanged(object sender, EventArgs e)
         {
-            if (!isLoaded)
-            {
-                return;
-            }
-            currentHue = (double)numericUpDownHue.Value;
+            currentValue = trackBarValue.Value;
             updateImage();
-           
+        }
+
+        private void buttonSave_Click(object sender, EventArgs e)
+        {
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                pictureBox.Image.Save(saveFileDialog1.FileName);
+            }
         }
     }
 }
