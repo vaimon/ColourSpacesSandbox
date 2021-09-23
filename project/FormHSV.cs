@@ -12,7 +12,7 @@ namespace project
 {
     public partial class FormHSV : Form
     {
-        int averageHue;
+        double averageHue;
         double averageSaturation;
         double averageValue;
 
@@ -42,7 +42,7 @@ namespace project
             {
                 if(this.hue + hue < 0)
                 {
-                    this.hue = 360 + this.hue - hue;
+                    this.hue += 360 + hue;
                 }
                 else
                 {
@@ -73,7 +73,9 @@ namespace project
                 {
                     value += val;
                 }
-
+                this.hue = Math.Round(this.hue, 1);
+                this.saturation = Math.Round(this.saturation, 1);
+                this.value = Math.Round(this.value, 1);
             }
         }
 
@@ -165,13 +167,13 @@ namespace project
                         value += Math.Round(hsv.value, 1);
                     }
                 }
-                currentHue = averageHue = (int) (hue / fbitmap.Count);
+                currentHue = averageHue = (hue / fbitmap.Count);
                 currentSaturation = averageSaturation = Math.Round(saturation / fbitmap.Count, 1);
                 currentValue = averageValue = Math.Round(value / fbitmap.Count,1);
             }
-            numericUpDownHue.Value = averageHue;
-            numericUpDownSaturation.Value = (int)averageSaturation;
-            numericUpDownValue.Value = (int)averageValue;
+            numericUpDownHue.Value = (decimal)averageHue;
+            numericUpDownSaturation.Value = (decimal)averageSaturation;
+            numericUpDownValue.Value = (decimal)averageValue;
             pictureBox.Image = bitmap;
             isLoaded = true;
         }
