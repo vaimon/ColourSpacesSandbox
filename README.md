@@ -1,2 +1,2 @@
-# VaimonLizzulyaVarl
-The best graphics repo in the world!!!!!!!!!!!!!!!
+# Colour spaces demo
+Choode an image and play with HSV params, extract RGB channels or convert it to grayscale
